@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Conclusion — COVID-19</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .factor-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); margin-top:2rem; }
+    .factor-card { background:var(--bg2); padding:1.8rem 1.5rem; }
+    .factor-icon { font-size:1.4rem; margin-bottom:.6rem; }
+    .factor-title { font-weight:500; font-size:.85rem; color:var(--ink); margin-bottom:.4rem; }
+    .factor-text { font-size:.77rem; color:var(--ink3); line-height:1.65; }
+    .anomaly-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:2rem; }
+    .anomaly-card { padding:1.5rem; border:1px solid var(--border); background:var(--bg2); }
+    .anomaly-flag { font-size:1.8rem; margin-bottom:.5rem; }
+    .anomaly-name { font-weight:500; font-size:.9rem; margin-bottom:.3rem; color:var(--ink); }
+    .anomaly-stat { font-family:var(--mono); font-size:.95rem; color:var(--red); margin-bottom:.5rem; }
+    .anomaly-text { font-size:.77rem; color:var(--ink3); line-height:1.65; }
+    .answer-box { background:var(--bg3); border:1px solid var(--border); padding:2.5rem; margin-top:1.5rem; }
+    .answer-box h2 { font-family:var(--display); font-size:1.8rem; font-weight:600; line-height:1.2; margin-bottom:1.2rem; color:var(--ink); }
+    .answer-box p { font-size:.85rem; color:var(--ink2); line-height:1.8; margin-bottom:.9rem; }
+    .answer-box p:last-child { margin-bottom:0; }
+    .answer-box strong { color:var(--ink); font-weight:500; }
+    @media(max-width:700px) { .factor-grid { grid-template-columns:1fr; } .anomaly-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-pip"></span>COVID·19 DATAVIZ</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="evolution.html">Évolution</a></li>
+    <li><a href="comparaison.html">Comparaison</a></li>
+    <li><a href="vaccination.html">Vaccination</a></li>
+    <li><a href="conclusion.html" class="active">Conclusion</a></li>
+  </ul>
+  <button class="nav-burger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-num">Conclusion — Réponse à la problématique</div>
+    <h1>Notre réponse,<br/>nuancée</h1>
+    <p>Ce que les données nous ont appris sur le rôle de la vaccination dans la réduction de la mortalité du COVID-19.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">Réponse à la problématique</div>
+    <h2 class="section-title">Oui — mais pas seule</h2>
+    <div class="answer-box">
+      <h2>La vaccination a-t-elle réduit la mortalité du COVID-19 ?</h2>
+      <p><strong>Oui, globalement.</strong> Nos données montrent une corrélation négative entre taux de vaccination et mortalité par million d'habitants : les pays les plus vaccinés ont en général moins de décès.</p>
+      <p>Le meilleur exemple est la vague Omicron (janvier 2022) : malgré un pic record de contaminations, les décès sont restés bien en dessous des vagues précédentes grâce aux vaccins.</p>
+      <p><strong>Mais la vaccination n'explique pas tout.</strong> Les États-Unis ont un taux de vaccination correct (~70%) et pourtant une mortalité très élevée (3 380 décès/million). Cela montre que d'autres facteurs jouent aussi.</p>
+      <p><strong>Conclusion :</strong> notre hypothèse est confirmée en partie — la vaccination est le facteur protecteur le plus important, mais elle est modulée par le contexte de chaque pays.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">Facteurs complémentaires</div>
+    <h2 class="section-title">Ce qui explique les exceptions</h2>
+    <p class="section-sub">6 facteurs qui modulent l'impact de la vaccination.</p>
+    <div class="factor-grid">
+      <div class="factor-card">
+        <div class="factor-icon">🏥</div>
+        <div class="factor-title">Système de santé</div>
+        <div class="factor-text">Un système universel réduit la mortalité. Le Japon cumule vaccination élevée et système de santé solide.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">👴</div>
+        <div class="factor-title">Âge de la population</div>
+        <div class="factor-text">Les pays vieillissants sont plus vulnérables. L'Afrique, avec une population jeune, est naturellement plus protégée.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">🏙️</div>
+        <div class="factor-title">Densité urbaine</div>
+        <div class="factor-text">Logements surpeuplés = propagation plus rapide. Le Pérou en est l'exemple le plus frappant.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">📋</div>
+        <div class="factor-title">Mesures sanitaires</div>
+        <div class="factor-text">Masques, confinements, traçage. La Corée du Sud a tout appliqué dès 2020, avant les vaccins.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">⚖️</div>
+        <div class="factor-title">Inégalités sociales</div>
+        <div class="factor-text">Aux USA, les populations défavorisées avaient moins accès aux soins et aux vaccins — ce qui aggrave le bilan.</div>
+      </div>
+      <div class="factor-card">
+        <div class="factor-icon">📊</div>
+        <div class="factor-title">Sous-déclaration</div>
+        <div class="factor-text">En Afrique et en Asie, beaucoup de décès ne sont pas comptés. Les chiffres officiels sous-estiment la réalité.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">Cas particuliers</div>
+    <h2 class="section-title">4 pays qui font exception</h2>
+    <p class="section-sub">Ces pays brisent ou confirment de façon extrême la tendance générale.</p>
+    <div class="anomaly-grid">
+      <div class="anomaly-card">
+        <div class="anomaly-flag">🇺🇸</div>
+        <div class="anomaly-name">États-Unis</div>
+        <div class="anomaly-stat">~70% vaccinés — 3 380 décès/M</div>
+        <div class="anomaly-text">Vaccination correcte mais mortalité très élevée. Raisons : système de santé privé inaccessible, inégalités raciales, obésité élevée (42%) et résistance aux vaccins dans certains États.</div>
+      </div>
+      <div class="anomaly-card">
+        <div class="anomaly-flag">🇯🇵</div>
+        <div class="anomaly-name">Japon</div>
+        <div class="anomaly-stat">~83% vaccinés — 531 décès/M</div>
+        <div class="anomaly-text">Confirme parfaitement notre hypothèse. Vaccination élevée + culture du masque + système de santé universel = un des meilleurs bilans parmi les pays développés.</div>
+      </div>
+      <div class="anomaly-card">
+        <div class="anomaly-flag">🇧🇬</div>
+        <div class="anomaly-name">Bulgarie</div>
+        <div class="anomaly-stat">~29% vaccinés — 5 350 décès/M</div>
+        <div class="anomaly-text">Peu vacciné et très mortellement touché. Confirme le lien : faible vaccination = forte mortalité. La méfiance envers les vaccins y était très répandue.</div>
+      </div>
+      <div class="anomaly-card">
+        <div class="anomaly-flag">🇳🇬</div>
+        <div class="anomaly-name">Nigeria</div>
+        <div class="anomaly-stat">&lt;5% vaccinés — ~15 décès/M</div>
+        <div class="anomaly-text">Très peu vacciné mais très peu de décès officiels. Explications : population très jeune (médiane ~18 ans) et surtout une très forte sous-déclaration des décès.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">Graphique de synthèse</div>
+    <h2 class="section-title">Vue finale — vaccination vs mortalité</h2>
+    <p class="section-sub">
+      Points <span style="color:var(--green);font-weight:500">verts</span> = confirment l'hypothèse ·
+      Points <span style="color:var(--red);font-weight:500">rouges</span> = anomalies notables ·
+      Points gris = dans la tendance
+    </p>
+    <div class="chart-box" style="height:400px" id="finalBox">
+      <canvas id="finalChart"></canvas>
+    </div>
+    <p class="chart-caption">Source : vaccination.csv — Our World in Data</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">COVID·19 DATAVIZ</div><p>Projet Dev Front — Dataviz 2</p></div>
+    <p>Sources : OMS · Our World in Data · ETL par DOUCOURE Hawa &amp; BA Fatoumata Batouly</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="utils.js"></script>
+<script>
+const ANOMALIES = ['United States','Japan','Bulgaria','Nigeria','Peru','Brazil'];
+
+function trendLine(data) {
+  const n=data.length; if(n<2) return [];
+  const sx=data.reduce((s,d)=>s+d.x,0), sy=data.reduce((s,d)=>s+d.y,0);
+  const sxy=data.reduce((s,d)=>s+d.x*d.y,0), sx2=data.reduce((s,d)=>s+d.x*d.x,0);
+  const slope=(n*sxy-sx*sy)/(n*sx2-sx*sx), ic=(sy-slope*sx)/n;
+  const xs=data.map(d=>d.x);
+  return [{x:Math.min(...xs),y:Math.max(0,slope*Math.min(...xs)+ic)},{x:Math.max(...xs),y:Math.max(0,slope*Math.max(...xs)+ic)}];
+}
+
+function ptColor(country, vacc, deaths) {
+  const expected=-30*vacc+3500;
+  const isAnomaly=ANOMALIES.some(a=>country&&country.includes(a));
+  if(isAnomaly&&deaths>expected+500) return RED;
+  if(isAnomaly&&deaths<expected-500) return RED;
+  if(deaths<expected-300) return GREEN;
+  return 'rgba(200,200,200,0.18)';
+}
+
+async function init() {
+  setLoading('finalBox');
+  const raw=await loadCSV('../data/transformed/vaccination.csv');
+  clearLoading('finalBox');
+  const valid=raw.filter(r=>r.people_fully_vaccinated_per_hundred!=null&&r.total_deaths_per_million!=null&&r.people_fully_vaccinated_per_hundred>0&&r.total_deaths_per_million>0);
+  const pts=valid.map(r=>({x:+r.people_fully_vaccinated_per_hundred,y:+r.total_deaths_per_million,country:r.country}));
+
+  new Chart(document.getElementById('finalChart'), {
+    type:'scatter',
+    data:{ datasets:[
+      { label:'Pays', data:pts, backgroundColor:pts.map(p=>ptColor(p.country,p.x,p.y)), borderColor:'transparent', pointRadius:6, pointHoverRadius:9 },
+      { label:'Tendance', data:trendLine(pts), type:'line', borderColor:'rgba(242,239,233,0.25)', borderDash:[5,3], borderWidth:1.5, pointRadius:0, fill:false }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...TOOLTIP, callbacks:{label:ctx=>{
+        if(ctx.datasetIndex===1) return null;
+        const p=pts[ctx.dataIndex];
+        return [p.country,`Vaccination : ${p.x.toFixed(1)}%`,`Décès : ${Math.round(p.y).toLocaleString('fr-FR')}/million`];
+      }}}},
+      scales:{
+        x:{min:0,max:100,title:{display:true,text:'Taux de vaccination (%)',color:INK3},grid:{color:GRID_COLOR},ticks:{color:INK3,callback:v=>v+'%'}},
+        y:{title:{display:true,text:"Décès par million d'habitants",color:INK3},grid:{color:GRID_COLOR},ticks:{color:INK3,callback:v=>v.toLocaleString('fr-FR')}}
+      }
+    },
+    plugins:[{id:'lbl',afterDatasetsDraw(chart){
+      const ctx2=chart.ctx; ctx2.save(); ctx2.font="500 9.5px 'DM Mono',monospace";
+      chart.getDatasetMeta(0).data.forEach((pt,i)=>{
+        const p=pts[i];
+        if(ANOMALIES.some(a=>p.country&&p.country.includes(a))){
+          const col=ptColor(p.country,p.x,p.y);
+          ctx2.fillStyle=col==='rgba(200,200,200,0.18)'?INK3:col;
+          ctx2.fillText(p.country,pt.x+9,pt.y-4);
+        }
+      });
+      ctx2.restore();
+    }}]
+  });
+}
+init();
+</script>
+</body>
+</html>

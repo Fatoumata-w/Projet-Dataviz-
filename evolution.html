@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Évolution mondiale — COVID-19</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-pip"></span>COVID·19 DATAVIZ</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="evolution.html" class="active">Évolution</a></li>
+    <li><a href="comparaison.html">Comparaison</a></li>
+    <li><a href="vaccination.html">Vaccination</a></li>
+    <li><a href="conclusion.html">Conclusion</a></li>
+  </ul>
+  <button class="nav-burger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-num">Sous-question 01 / 03</div>
+    <h1>Comment la pandémie<br/>a-t-elle évolué ?</h1>
+    <p>Évolution des cas et décès dans le monde de 2020 à 2023 — les 3 grandes vagues.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">01.1 · Nouveaux cas par mois</div>
+    <h2 class="section-title">Les trois vagues</h2>
+    <p class="section-sub">Chaque barre représente le total de nouveaux cas dans le monde pour un mois donné.</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchType('bar', this)">Barres</button>
+      <button class="tab-btn" onclick="switchType('line', this)">Courbe</button>
+    </div>
+    <div class="chart-box" style="height:360px" id="casesBox">
+      <canvas id="casesChart"></canvas>
+    </div>
+    <p class="chart-caption">Source : evolution_mondiale.csv — OMS</p>
+    <div class="three-col" style="margin-top:1.5rem">
+      <div class="insight">
+        <div class="insight-title">🟡 Vague 1 — Alpha (2020)</div>
+        <p>Début de la pandémie. Pas de vaccin disponible. Confinements stricts pour limiter la propagation.</p>
+      </div>
+      <div class="insight">
+        <div class="insight-title">🟠 Vague 2 — Delta (2021)</div>
+        <p>Variant plus contagieux. Les pays peu vaccinés ont payé un lourd tribut.</p>
+      </div>
+      <div class="insight">
+        <div class="insight-title">🔴 Vague 3 — Omicron (jan. 2022)</div>
+        <p>Pic record de contaminations. Mais grâce aux vaccins, la mortalité est restée bien en dessous des vagues précédentes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">01.2 · Cas et décès comparés</div>
+    <h2 class="section-title">Le découplage — la preuve clé</h2>
+    <p class="section-sub">En rouge les cas (axe gauche), en bleu les décès (axe droit). À partir de début 2022, les deux courbes divergent : les cas explosent mais les décès ne suivent plus.</p>
+    <div class="chart-box" style="height:360px" id="combinedBox">
+      <canvas id="combinedChart"></canvas>
+    </div>
+    <p class="chart-caption">Source : evolution_mondiale.csv — OMS · Double axe : cas (M) et décès (k)</p>
+    <div class="insight">
+      <div class="insight-title">Pourquoi ce graphique est important</div>
+      <p>Ce "ciseau" entre les courbes cas et décès à partir de janvier 2022 est la preuve la plus visuelle de l'efficacité des vaccins : malgré des contaminations record, les décès n'ont pas suivi la même progression.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">COVID·19 DATAVIZ</div><p>Projet Dev Front — Dataviz 2</p></div>
+    <p>Source : OMS · evolution_mondiale.csv</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="utils.js"></script>
+<script>
+let casesChart, monthLabels, monthCases, monthDeaths;
+const MOIS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+function fmtMonth(ym) { const [y,m] = ym.split('-'); return `${MOIS[+m-1]} ${y.slice(2)}`; }
+function barColors(cases) {
+  return cases.map((_, i) => i < 12 ? 'rgba(232,48,42,0.3)' : i < 24 ? 'rgba(232,48,42,0.6)' : 'rgba(232,48,42,0.92)');
+}
+async function init() {
+  setLoading('casesBox'); setLoading('combinedBox');
+  const evo = await loadCSV('../data/transformed/evolution_mondiale.csv');
+  const byMonth = {};
+  evo.forEach(r => {
+    const m = r.date ? r.date.slice(0,7) : null;
+    if (!m) return;
+    if (!byMonth[m]) byMonth[m] = { cases: 0, deaths: 0 };
+    byMonth[m].cases  += r.new_cases  || 0;
+    byMonth[m].deaths += r.new_deaths || 0;
+  });
+  const keys = Object.keys(byMonth).sort();
+  monthLabels = keys.map(fmtMonth);
+  monthCases  = keys.map(k => byMonth[k].cases  / 1e6);
+  monthDeaths = keys.map(k => byMonth[k].deaths / 1e3);
+  clearLoading('casesBox'); clearLoading('combinedBox');
+
+  casesChart = new Chart(document.getElementById('casesChart'), {
+    type: 'bar',
+    data: { labels: monthLabels, datasets: [{ label: 'Nouveaux cas (M)', data: monthCases,
+        backgroundColor: barColors(monthCases), borderRadius: 2, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP, callbacks: { label: c => `${c.parsed.y.toFixed(1)} M cas` } } },
+      scales: { x: { grid: { display: false }, ticks: { maxRotation: 45, maxTicksLimit: 14 } },
+                y: { grid: { color: GRID_COLOR }, ticks: { callback: v => v.toFixed(0)+' M' } } }
+    }
+  });
+
+  new Chart(document.getElementById('combinedChart'), {
+    type: 'line',
+    data: { labels: monthLabels, datasets: [
+      { label: 'Cas (M)', data: monthCases, borderColor: RED, backgroundColor: RED2,
+        fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, yAxisID: 'yCas' },
+      { label: 'Décès (k)', data: monthDeaths, borderColor: BLUE, backgroundColor: 'transparent',
+        fill: false, tension: 0.4, borderWidth: 2, borderDash: [5,3], pointRadius: 0, yAxisID: 'yDeces' }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { ...TOOLTIP } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 45, maxTicksLimit: 14 } },
+        yCas:   { type: 'linear', position: 'left',  grid: { color: GRID_COLOR }, ticks: { color: RED,  callback: v => v.toFixed(0)+' M' } },
+        yDeces: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: BLUE, callback: v => v.toFixed(0)+' k' } }
+      }
+    }
+  });
+}
+function switchType(type, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  casesChart.config.type = type;
+  const ds = casesChart.data.datasets[0];
+  if (type === 'line') {
+    ds.backgroundColor = RED2; ds.borderColor = RED; ds.fill = true; ds.tension = 0.4; ds.borderWidth = 2; ds.pointRadius = 2;
+  } else {
+    ds.backgroundColor = barColors(monthCases); ds.borderColor = 'transparent'; ds.fill = false; ds.pointRadius = 0;
+  }
+  casesChart.update();
+}
+init();
+</script>
+</body>
+</html>

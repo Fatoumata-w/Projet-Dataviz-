@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Comparaison pays — COVID-19</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-pip"></span>COVID·19 DATAVIZ</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="evolution.html">Évolution</a></li>
+    <li><a href="comparaison.html" class="active">Comparaison</a></li>
+    <li><a href="vaccination.html">Vaccination</a></li>
+    <li><a href="conclusion.html">Conclusion</a></li>
+  </ul>
+  <button class="nav-burger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-num">Sous-question 02 / 03</div>
+    <h1>Quels pays ont été<br/>les plus touchés ?</h1>
+    <p>Classement par décès par million d'habitants — toujours normaliser par la population pour comparer équitablement.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">02.1 · Classement des pays</div>
+    <h2 class="section-title">Top 20 pays — décès par million</h2>
+    <p class="section-sub">Changez la métrique pour modifier le classement.</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchMetric('deaths_per_million', this)">Décès / million</button>
+      <button class="tab-btn" onclick="switchMetric('cases_per_million', this)">Cas / million</button>
+      <button class="tab-btn" onclick="switchMetric('mortality_rate', this)">Taux de mortalité %</button>
+    </div>
+    <div class="chart-box" style="height:480px" id="paysBox">
+      <canvas id="paysChart"></canvas>
+    </div>
+    <p class="chart-caption">Source : stats_pays.csv — OMS + Our World in Data</p>
+    <div class="insight">
+      <div class="insight-title">Pourquoi diviser par la population ?</div>
+      <p>Sans normalisation, les USA et l'Inde dominent juste parce qu'ils sont grands. En décès par million, des petits pays comme la Bulgarie ou la Bosnie apparaissent parmi les plus touchés — ce qui est la vraie réalité.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">02.2 · Par continent</div>
+    <h2 class="section-title">Comparaison entre continents</h2>
+    <p class="section-sub">Cas et décès totaux par continent — données OMS.</p>
+    <div class="two-col">
+      <div>
+        <div class="chart-box" style="height:260px" id="contBox1"><canvas id="contChart1"></canvas></div>
+        <p class="chart-caption">Total cas par continent</p>
+      </div>
+      <div>
+        <div class="chart-box" style="height:260px" id="contBox2"><canvas id="contChart2"></canvas></div>
+        <p class="chart-caption">Total décès par continent</p>
+      </div>
+    </div>
+    <div class="insight" style="margin-top:1.5rem">
+      <div class="insight-title">L'Europe et les Amériques en tête</div>
+      <p>Ces deux continents concentrent la majorité des cas et décès. L'Afrique affiche des chiffres très bas — mais attention : une grande partie des décès n'y est probablement pas déclarée.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">02.3 · Tableau</div>
+    <h2 class="section-title">Top 20 pays — détail complet</h2>
+    <div class="chart-box" style="padding:0;overflow:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Pays</th><th>Continent</th>
+            <th>Décès / million</th><th>Cas / million</th><th>Taux mortalité %</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">COVID·19 DATAVIZ</div><p>Projet Dev Front — Dataviz 2</p></div>
+    <p>Sources : OMS · Our World in Data</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="utils.js"></script>
+<script>
+// Traduction codes OMS → noms de continents en français
+const WHO_FR = {
+  'AFRO':  'Afrique',
+  'AMRO':  'Amériques',
+  'EURO':  'Europe',
+  'SEARO': 'Asie du Sud',
+  'WPRO':  'Pacifique',
+  'EMRO':  'Proche-Orient',
+  'OTHER': 'Autre'
+};
+const CONT_COLORS = [RED, BLUE, GREEN, AMBER, PURPLE, '#7A7670'];
+
+function metricLabel(m) {
+  return m === 'deaths_per_million' ? 'Décès / million' : m === 'cases_per_million' ? 'Cas / million' : 'Taux de mortalité (%)';
+}
+
+let paysChart, allPays, currentMetric = 'deaths_per_million';
+
+async function init() {
+  setLoading('paysBox'); setLoading('contBox1'); setLoading('contBox2');
+  const [raw, cont] = await Promise.all([
+    loadCSV('../data/transformed/stats_pays.csv'),
+    loadCSV('../data/transformed/stats_continents.csv')
+  ]);
+  allPays = raw.filter(r => r.deaths_per_million != null && r.deaths_per_million > 0 && r.Country);
+  clearLoading('paysBox'); clearLoading('contBox1'); clearLoading('contBox2');
+
+  drawPays('deaths_per_million');
+
+  // Continents — noms en français
+  const filtCont = cont.filter(r => r.continent !== 'Other' && r.continent !== 'OTHER' && r.continent !== 'EMRO');
+  const contLabels = filtCont.map(r => WHO_FR[r.continent] || r.continent);
+  const contColors = filtCont.map((_, i) => CONT_COLORS[i % CONT_COLORS.length]);
+
+  new Chart(document.getElementById('contChart1'), {
+    type: 'doughnut',
+    data: { labels: contLabels, datasets: [{ data: filtCont.map(r => r.total_cases), backgroundColor: contColors, borderWidth: 3, borderColor: '#111' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 }, color: INK } },
+        tooltip: { ...TOOLTIP, callbacks: { label: c => `${c.label} : ${(c.parsed/1e6).toFixed(1)} M cas` } } }
+    }
+  });
+
+  new Chart(document.getElementById('contChart2'), {
+    type: 'bar',
+    data: { labels: contLabels, datasets: [{ data: filtCont.map(r => r.total_deaths), backgroundColor: contColors, borderRadius: 3, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP, callbacks: { label: c => `${(c.parsed.y/1e3).toFixed(0)} k décès` } } },
+      scales: { x: { grid: { display: false }, ticks: { color: INK3 } }, y: { grid: { color: GRID_COLOR }, ticks: { callback: v => (v/1e3).toFixed(0)+'k', color: INK3 } } }
+    }
+  });
+
+  // Tableau top 20
+  const top20 = [...allPays].sort((a,b) => b.deaths_per_million - a.deaths_per_million).slice(0,20);
+  const tbody = document.getElementById('tableBody');
+  top20.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-rank">${String(i+1).padStart(2,'0')}</td>
+      <td class="td-name">${p.Country}</td>
+      <td style="color:var(--ink3);font-size:.75rem">${WHO_FR[p.WHO_region] || p.WHO_region || '—'}</td>
+      <td class="td-red">${p.deaths_per_million ? (+p.deaths_per_million).toLocaleString('fr-FR') : '—'}</td>
+      <td class="td-mono">${p.cases_per_million ? (+p.cases_per_million).toLocaleString('fr-FR') : '—'}</td>
+      <td class="${p.mortality_rate > 3 ? 'td-red' : 'td-mono'}">${p.mortality_rate != null ? p.mortality_rate+'%' : '—'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function drawPays(metric) {
+  const top20 = [...allPays].filter(p => p[metric] != null).sort((a,b) => b[metric]-a[metric]).slice(0,20);
+  const useBlue = metric === 'mortality_rate';
+  const colors = top20.map((_, i) => {
+    const a = 0.35 + 0.65 * (1 - i/20);
+    return useBlue ? `rgba(58,126,200,${a})` : `rgba(232,48,42,${a})`;
+  });
+  if (paysChart) paysChart.destroy();
+  paysChart = new Chart(document.getElementById('paysChart'), {
+    type: 'bar',
+    data: { labels: top20.map(p => p.Country), datasets: [{ label: metricLabel(metric), data: top20.map(p => p[metric]), backgroundColor: colors, borderRadius: 2, borderSkipped: false }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP, callbacks: { label: c => `${c.parsed.x.toLocaleString('fr-FR')} ${metricLabel(metric)}` } } },
+      scales: { x: { grid: { color: GRID_COLOR }, ticks: { color: INK3 } }, y: { grid: { display: false }, ticks: { font: { size: 11 }, color: INK3 } } }
+    }
+  });
+}
+
+function switchMetric(metric, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMetric = metric;
+  drawPays(metric);
+}
+init();
+</script>
+</body>
+</html>

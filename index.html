@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>COVID-19 — Analyse Mondiale</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-pip"></span>COVID·19 DATAVIZ</div>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Accueil</a></li>
+    <li><a href="evolution.html">Évolution</a></li>
+    <li><a href="comparaison.html">Comparaison</a></li>
+    <li><a href="vaccination.html">Vaccination</a></li>
+    <li><a href="conclusion.html">Conclusion</a></li>
+  </ul>
+  <button class="nav-burger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <span class="hero-eyebrow">PROJET DATAVIZ 2 · DEV FRONT</span>
+  <span class="hero-year">2020 — 2023</span>
+  <div class="hero-rule"></div>
+  <p class="hero-label">Données OMS · Our World in Data</p>
+  <h1 class="hero-title">
+    La vaccination<br/>
+    a-t-elle réduit<br/>
+    la <em>mortalité</em><br/>
+    du COVID-19 ?
+  </h1>
+  <p class="hero-sub">
+    Analyse mondiale pour comprendre si la vaccination a réduit les décès liés au COVID-19,
+    et pourquoi certains pays font exception.
+  </p>
+  <div class="hero-hyp">
+    <strong>Hypothèse :</strong> Les pays ayant vacciné massivement ont enregistré moins de décès
+    par million d'habitants — mais d'autres facteurs (système de santé, densité, politique sanitaire)
+    modulent ce résultat.
+  </div>
+  <div class="hero-scroll">défiler</div>
+</section>
+
+<div class="stats-band">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-num"><span id="s1">—</span></div>
+      <div class="stat-lbl">Cas confirmés dans le monde</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span id="s2">—</span></div>
+      <div class="stat-lbl">Décès officiels</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span id="s3">—</span></div>
+      <div class="stat-lbl">Doses de vaccin administrées</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span id="s4">—</span></div>
+      <div class="stat-lbl">Pays analysés</div>
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">Structure de l'analyse</div>
+    <h2 class="section-title">4 sous-questions</h2>
+    <p class="section-sub">Chaque page répond à une question précise pour construire progressivement notre réponse.</p>
+    <div class="nav-cards">
+      <a href="evolution.html" class="nav-card fade-up">
+        <div class="nc-num">01</div>
+        <div class="nc-title">Évolution mondiale</div>
+        <div class="nc-sub">Comment la pandémie a-t-elle évolué dans le temps ?</div>
+        <span class="nc-arrow">→</span>
+      </a>
+      <a href="comparaison.html" class="nav-card fade-up" style="transition-delay:.1s">
+        <div class="nc-num">02</div>
+        <div class="nc-title">Comparaison pays</div>
+        <div class="nc-sub">Quels pays ont été les plus touchés par rapport à leur population ?</div>
+        <span class="nc-arrow">→</span>
+      </a>
+      <a href="vaccination.html" class="nav-card fade-up" style="transition-delay:.2s">
+        <div class="nc-num">03</div>
+        <div class="nc-title">Vaccination</div>
+        <div class="nc-sub">Y a-t-il un lien entre vaccination et mortalité ?</div>
+        <span class="nc-arrow">→</span>
+      </a>
+      <a href="conclusion.html" class="nav-card fade-up" style="transition-delay:.3s">
+        <div class="nc-num">04</div>
+        <div class="nc-title">Conclusion</div>
+        <div class="nc-sub">Notre réponse à la problématique, nuancée et justifiée.</div>
+        <span class="nc-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">Aperçu</div>
+    <h2 class="section-title">L'évolution des cas dans le monde</h2>
+    <p class="section-sub">Nouveaux cas mensuels de janvier 2020 à décembre 2023 — source OMS.</p>
+    <div class="chart-box" style="height:300px" id="previewBox">
+      <canvas id="previewChart"></canvas>
+    </div>
+    <p class="chart-caption">Source : evolution_mondiale.csv — OMS</p>
+    <div class="insight">
+      <div class="insight-title">Janvier 2022 — La vague Omicron : pic absolu des contaminations</div>
+      <p>Omicron a causé un pic record de contaminations, mais la mortalité est restée contenue grâce à la vaccination. C'est ce qu'on appellera le "découplage" dans la page Évolution.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">COVID·19 DATAVIZ</div><p>Projet Dev Front — Dataviz 2</p></div>
+    <p>Sources : OMS · Our World in Data · ETL par DOUCOURE Hawa &amp; BA Fatoumata Batouly</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="utils.js"></script>
+<script>
+async function initStats() {
+  const evo  = await loadCSV('../data/transformed/evolution_mondiale.csv');
+  const pays = await loadCSV('../data/transformed/stats_pays.csv');
+  const last = evo[evo.length - 1];
+  animCounter(document.getElementById('s1'), (last.cumulative_cases  || 0) / 1e6, ' M', 1);
+  animCounter(document.getElementById('s2'), (last.cumulative_deaths || 0) / 1e6, ' M', 2);
+  animCounter(document.getElementById('s3'), 13.5, ' Md', 1);
+  animCounter(document.getElementById('s4'), pays.length, '', 0);
+}
+
+async function initPreview() {
+  setLoading('previewBox');
+  const evo = await loadCSV('../data/transformed/evolution_mondiale.csv');
+  clearLoading('previewBox');
+  const byMonth = {};
+  evo.forEach(r => {
+    const m = r.date ? r.date.slice(0, 7) : null;
+    if (!m) return;
+    if (!byMonth[m]) byMonth[m] = 0;
+    byMonth[m] += r.new_cases || 0;
+  });
+  const labels = Object.keys(byMonth).sort();
+  const values = labels.map(m => byMonth[m] / 1e6);
+  const MOIS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  new Chart(document.getElementById('previewChart'), {
+    type: 'line',
+    data: {
+      labels: labels.map(l => { const [y,m] = l.split('-'); return `${MOIS[+m-1]} ${y.slice(2)}`; }),
+      datasets: [{ data: values, borderColor: RED, backgroundColor: RED2,
+        fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TOOLTIP, callbacks: { label: c => `${c.parsed.y.toFixed(1)} M cas` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 10, maxRotation: 0 } },
+        y: { grid: { color: GRID_COLOR }, ticks: { callback: v => v.toFixed(0) + ' M' } }
+      }
+    }
+  });
+}
+initStats();
+initPreview();
+</script>
+</body>
+</html>
