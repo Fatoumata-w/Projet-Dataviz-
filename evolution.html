@@ -92,7 +92,7 @@ function barColors(cases) {
 }
 async function init() {
   setLoading('casesBox'); setLoading('combinedBox');
-  const evo = await loadCSV('../data/transformed/evolution_mondiale.csv');
+  const evo = await loadCSV('/data/transformed/evolution_mondiale.csv');
   const byMonth = {};
   evo.forEach(r => {
     const m = r.date ? r.date.slice(0,7) : null;
