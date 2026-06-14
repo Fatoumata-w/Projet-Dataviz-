@@ -49,10 +49,7 @@ Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur 
 ---
 
 ## Sources de données
-
-Les données utilisées proviennent de sources Open Data publiques :
-
-- Our World In Data (OWID)
+- Our World In Data (OWID) - Compact COVID Dataset
 - Organisation Mondiale de la Santé (OMS)
 
 Les données sont récupérées au format CSV puis préparées afin d'être exploitées par l'application web.
