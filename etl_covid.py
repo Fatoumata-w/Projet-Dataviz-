@@ -1,186 +1,144 @@
-import pandas as pd
-import numpy as np
 import os
+import pandas as pd
 
+# ======================================
+# ETL COVID-19
+# Extract -> Transform -> Load
+# ======================================
 
-# =========================
-# 1. EXTRACT
-# =========================
+# Source Open Data : Our World In Data
+URL = "https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv"
+DOSSIER_SORTIE = "data/transformed"
 
-url = "https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv"
-print("⏳ Téléchargement des données OWID...")
-df = pd.read_csv(url, low_memory=False)
-print(f"✅ Dataset chargé : {len(df)} lignes, {len(df.columns)} colonnes")
-print("Colonnes disponibles :", df.columns.tolist())
+print("Téléchargement des données...")
 
-# =========================
-# 2. CLEAN
-# =========================
+# EXTRACT : on récupère le CSV en ligne
+df = pd.read_csv(URL)
 
-# Détection dynamique de la colonne pays
-if 'location' in df.columns:
-    loc_col = 'location'
-elif 'entity' in df.columns:
-    loc_col = 'entity'
-elif 'Country' in df.columns:
-    loc_col = 'Country'
-elif 'country' in df.columns:
-    loc_col = 'country'
-else:
-    raise KeyError("Impossible de trouver une colonne correspondant au nom du pays (location/entity/Country/country).")
+# TRANSFORM : on garde seulement les colonnes utiles pour le site
+colonnes = [
+    "country",
+    "date",
+    "continent",
+    "population",
+    "new_cases",
+    "new_deaths",
+    "total_cases",
+    "total_deaths",
+    "people_fully_vaccinated_per_hundred"
+]
 
-# Colonnes essentielles à garder si elles existent
-needed_cols = {
-    'location': loc_col,
-    'continent': 'continent',
-    'date': 'date',
-    'population': 'population',
-    'new_cases': 'new_cases',
-    'new_deaths': 'new_deaths',
-    'total_cases': 'total_cases',
-    'total_deaths': 'total_deaths',
-    'people_fully_vaccinated_per_hundred': 'people_fully_vaccinated_per_hundred',
-    'code': 'code'
-}
+df = df[colonnes]
 
-cols = [col for col in needed_cols.values() if col in df.columns]
-df = df[cols].copy()
+# On garde le même nom de colonne que dans le site
+df = df.rename(columns={"country": "location"})
 
-# Harmoniser le nom "location"
-df = df.rename(columns={loc_col: 'location'})
+# Nettoyage simple
+df["date"] = pd.to_datetime(df["date"])
+df = df.dropna(subset=["location", "date", "population"])
 
-# Conversion date en datetime
-df['date'] = pd.to_datetime(df['date'], errors='coerce')
+# Les valeurs vides sont remplacées par 0 pour éviter les erreurs de calcul
+for col in ["new_cases", "new_deaths", "total_cases", "total_deaths"]:
+    df[col] = df[col].fillna(0)
 
-# Supprimer lignes sans continent ou population
-if 'continent' in df.columns:
-    df = df[df['continent'].notna()]
-df = df[df['population'].notna()]
+# On enlève les lignes qui ne correspondent pas à un pays réel
+df = df[df["continent"].notna()]
 
-# Remplacer NaN dans les compteurs par 0
-for metric in ['new_cases','new_deaths','total_cases','total_deaths']:
-    if metric in df.columns:
-        df[metric] = df[metric].fillna(0)
-
-print(f"✅ Après nettoyage : {df['location'].nunique()} entités, {df['date'].min().date()} → {df['date'].max().date()}")
-
-# =========================
-# 3. TRANSFORM
-# =========================
-
-# ──────────────────────────
-# 3.1 evolution_mondiale.csv
-# ──────────────────────────
-evolution = (
-    df.groupby('date')
-    .agg(
-        new_cases=('new_cases', 'sum'),
-        new_deaths=('new_deaths', 'sum'),
-        cumulative_cases=('total_cases', 'sum'),
-        cumulative_deaths=('total_deaths', 'sum'),
-    )
-    .reset_index()
+# La vaccination n'est pas remplie tous les jours dans le fichier OWID.
+# On reprend donc la dernière valeur connue pour chaque pays.
+df = df.sort_values(["location", "date"])
+df["people_fully_vaccinated_per_hundred"] = (
+    df.groupby("location")["people_fully_vaccinated_per_hundred"].ffill()
 )
 
-evolution = evolution[evolution['date'] <= '2023-12-31']
-evolution['date'] = evolution['date'].dt.strftime('%Y-%m-%d')
+# Création du dossier de sortie
+os.makedirs(DOSSIER_SORTIE, exist_ok=True)
 
-# ──────────────────────────
-# 3.2 stats_pays.csv
-# ──────────────────────────
-latest = df.sort_values('date').groupby('location').tail(1).copy()
 
-# Mapping continent → WHO region
-continent_to_who = {
-    'Africa':        'AFRO',
-    'Asia':          'SEARO',
-    'Europe':        'EURO',
-    'North America': 'AMRO',
-    'South America': 'AMRO',
-    'Oceania':       'WPRO',
+# ======================================
+# 1. Evolution mondiale
+# ======================================
+
+evolution = df.groupby("date", as_index=False).agg({
+    "new_cases": "sum",
+    "new_deaths": "sum",
+    "total_cases": "sum",
+    "total_deaths": "sum"
+})
+
+# Le site utilise ces noms de colonnes
+evolution = evolution.rename(columns={
+    "total_cases": "cumulative_cases",
+    "total_deaths": "cumulative_deaths"
+})
+
+evolution["date"] = evolution["date"].dt.strftime("%Y-%m-%d")
+evolution.to_csv(f"{DOSSIER_SORTIE}/evolution_mondiale.csv", index=False)
+
+
+# ======================================
+# 2. Statistique par pays
+# ======================================
+
+# On prend la dernière ligne disponible pour chaque pays
+latest = df.sort_values("date").groupby("location").tail(1).copy()
+
+# Regroupement simple des continents en zones OMS
+regions = {
+    "Africa": "AFRO",
+    "Europe": "EURO",
+    "Asia": "SEARO",
+    "North America": "AMRO",
+    "South America": "AMRO",
+    "Oceania": "WPRO"
 }
 
-if 'continent' in latest.columns:
-    latest['WHO_region'] = latest['continent'].map(continent_to_who).fillna('OTHER')
-else:
-    latest['WHO_region'] = 'OTHER'
-
-# Calculs sécurisés
-latest['deaths_per_million'] = (latest['total_deaths'] / latest['population'] * 1e6).round(2)
-latest['cases_per_million'] = (latest['total_cases'] / latest['population'] * 1e6).round(2)
-latest['mortality_rate'] = (
-    (latest['total_deaths'] / latest['total_cases'].replace(0, np.nan) * 100)
-    .fillna(0)
-    .round(2)
-)
+latest["WHO_region"] = latest["continent"].map(regions).fillna("OTHER")
+latest["deaths_per_million"] = (latest["total_deaths"] / latest["population"] * 1_000_000).round(2)
+latest["cases_per_million"] = (latest["total_cases"] / latest["population"] * 1_000_000).round(2)
+latest["mortality_rate"] = (latest["total_deaths"] / latest["total_cases"].replace(0, pd.NA) * 100).fillna(0).round(2)
 
 stats_pays = latest[[
-    'location', 'WHO_region',
-    'deaths_per_million', 'cases_per_million', 'mortality_rate'
-]].rename(columns={'location': 'Country'})
+    "location",
+    "WHO_region",
+    "deaths_per_million",
+    "cases_per_million",
+    "mortality_rate"
+]].rename(columns={"location": "Country"})
 
-# ──────────────────────────
-# 3.3 stats_continents.csv
-# ──────────────────────────
-if 'continent' in latest.columns:
-    stats_continents = (
-        latest.groupby('continent')
-        .agg(
-            total_cases=('total_cases', 'sum'),
-            total_deaths=('total_deaths', 'sum'),
-        )
-        .reset_index()
-    )
+stats_pays.to_csv(f"{DOSSIER_SORTIE}/stats_pays.csv", index=False)
 
-    stats_continents['continent'] = stats_continents['continent'].map(continent_to_who).fillna('OTHER')
 
-    stats_continents = (
-        stats_continents.groupby('continent')
-        .agg(total_cases=('total_cases', 'sum'), total_deaths=('total_deaths', 'sum'))
-        .reset_index()
-    )
-else:
-    stats_continents = pd.DataFrame()
+# ======================================
+# 3. Vaccination
+# ======================================
 
-# ──────────────────────────
-# 3.4 vaccination.csv
-# ──────────────────────────
-vaccination = pd.DataFrame()
-if 'people_fully_vaccinated_per_hundred' in df.columns:
-    vacc_max = (
-        df.groupby('location')['people_fully_vaccinated_per_hundred']
-        .max()
-        .reset_index()
-    )
+vaccination = latest[[
+    "location",
+    "people_fully_vaccinated_per_hundred",
+    "deaths_per_million"
+]].copy()
 
-    vaccination = latest[['location','population','total_deaths']].merge(
-        vacc_max, on='location', how='left'
-    )
+vaccination = vaccination.rename(columns={
+    "location": "country",
+    "deaths_per_million": "total_deaths_per_million"
+})
 
-    vaccination['total_deaths_per_million'] = (vaccination['total_deaths'] / vaccination['population'] * 1e6).round(2)
+vaccination = vaccination.dropna(subset=["people_fully_vaccinated_per_hundred"])
+vaccination.to_csv(f"{DOSSIER_SORTIE}/vaccination.csv", index=False)
 
-    vaccination = vaccination[[
-        'location',
-        'people_fully_vaccinated_per_hundred',
-        'total_deaths_per_million'
-    ]].rename(columns={'location': 'country'})
 
-# Supprimer les pays sans données de vaccination
-vaccination = vaccination[vaccination['people_fully_vaccinated_per_hundred'].notna()]
+# ======================================
+# 4. Statistiques par continent
+# ======================================
 
-# =========================
-# 4. LOAD
-# =========================
-os.makedirs("data/transformed", exist_ok=True)
+stats_continents = latest.groupby("WHO_region", as_index=False).agg({
+    "total_cases": "sum",
+    "total_deaths": "sum"
+})
 
-evolution.to_csv("data/transformed/evolution_mondiale.csv", index=False)
-stats_pays.to_csv("data/transformed/stats_pays.csv", index=False)
-stats_continents.to_csv("data/transformed/stats_continents.csv", index=False)
-vaccination.to_csv("data/transformed/vaccination.csv", index=False)
+stats_continents = stats_continents.rename(columns={"WHO_region": "continent"})
+stats_continents.to_csv(f"{DOSSIER_SORTIE}/stats_continents.csv", index=False)
 
-print("\nETL terminé avec succès !")
-print(f"   evolution_mondiale.csv : {len(evolution)} lignes")
-print(f"   stats_pays.csv         : {len(stats_pays)} pays")
-print(f"   stats_continents.csv   : {len(stats_continents)} continents")
-print(f"   vaccination.csv        : {len(vaccination)} pays")
-print("\n Fichiers dans : data/transformed/")
+print("ETL terminé.")
+print("Les fichiers CSV ont été créés dans data/transformed/")
