@@ -1,29 +1,31 @@
-# COVID‑19 DATAVIZ 2 — Analyse mondiale de la pandémie  
-Projet réalisé par Fatoumata Batouly BA , Aissatou Diop &  Hawa Doucouré
-EPSI Paris — BTS SIO SLAM — Dataviz 2
+# COVID-19 DATAVIZ 2 — Analyse mondiale de la pandémie
+
+**Projet réalisé par Fatoumata Batouly BA, Aissatou Diop et Hawa Doucouré**  
+**EPSI Paris — BTS SIO SLAM**
 
 ---
 
 ## Présentation du projet
 
-L'objectif du projet est de concevoir un pipeline ETL permettant d'extraire, transformer et charger des données relatives au COVID-19 afin de les exploiter dans une application web de visualisation.
+Dans le cadre du BTS SIO option SLAM, ce projet a été réalisé en groupe afin de mettre en œuvre un pipeline ETL complet permettant d'exploiter des données ouvertes relatives à la pandémie de COVID-19.
 
-L'application permet d'analyser et de comparer différents indicateurs grâce à des graphiques interactifs.
+L'objectif est de récupérer des données issues de sources Open Data, de les transformer afin de les rendre exploitables puis de les afficher dans une application web interactive proposant plusieurs visualisations graphiques.
 
 ---
 
 ## Problématique
 
-Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur analyse et leur compréhension à travers une interface web interactive ?
+Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur analyse et leur compréhension grâce à une interface web de visualisation interactive ?
 
 ---
 
-## Objectifs
+## Objectifs du projet
 
 - Définir une problématique autour d'un jeu de données.
-- Concevoir un pipeline ETL.
+- Concevoir un pipeline ETL automatisé.
+- Extraire, transformer et charger des données issues de sources Open Data.
 - Développer une interface web de visualisation.
-- Analyser et interpréter les données.
+- Analyser et interpréter les données à travers différents graphiques.
 
 ---
 
@@ -48,35 +50,47 @@ Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur 
 
 ## Sources de données
 
-Les données utilisées proviennent de sources Open Data :
+Les données utilisées proviennent de sources Open Data publiques :
 
 - Our World In Data (OWID)
 - Organisation Mondiale de la Santé (OMS)
 
-Les données sont récupérées au format CSV puis préparées pour l'affichage des graphiques.
+Les données sont récupérées au format CSV puis préparées afin d'être exploitées par l'application web.
 
 ---
 
-## Fonctionnement du pipeline ETL
+## Pipeline ETL
 
 ### 1. Extract
 
-- Récupération des données depuis des sources publiques.
-- Import des fichiers CSV.
-- Centralisation des données pour traitement.
+Cette étape consiste à récupérer les données depuis des sources Open Data.
+
+Actions réalisées :
+
+- Récupération des données COVID-19 depuis OWID et l'OMS.
+- Import des fichiers au format CSV.
+- Centralisation des données pour leur traitement.
 
 ### 2. Transform
 
-- Tri des données selon différents critères.
-- Nettoyage des valeurs incohérentes ou manquantes.
-- Structuration et normalisation des données.
-- Agrégation des données pour faciliter l'analyse.
+Cette étape permet de préparer les données pour l'analyse.
+
+Actions réalisées :
+
+- Tri des données selon différents critères (dates, pays, indicateurs).
+- Nettoyage des données manquantes ou incohérentes.
+- Structuration et normalisation des informations.
+- Agrégation des données afin de faciliter les analyses statistiques.
 
 ### 3. Load
 
-- Export des données nettoyées au format CSV.
-- Organisation des données selon les besoins des graphiques.
-- Préparation des données pour l'application web.
+Cette étape consiste à préparer les données pour l'application.
+
+Actions réalisées :
+
+- Génération de fichiers CSV structurés.
+- Organisation des données selon les besoins des visualisations.
+- Mise à disposition des données pour l'application web.
 
 ---
 
@@ -90,12 +104,12 @@ Sources Open Data (OWID / OMS)
                 │
                 ▼
            Transform
-     (tri, nettoyage,
-      normalisation)
+      (tri, nettoyage,
+       normalisation)
                 │
                 ▼
               Load
-        (fichiers CSV)
+       (génération CSV)
                 │
                 ▼
       Application Web
@@ -111,19 +125,20 @@ Sources Open Data (OWID / OMS)
 
 L'application permet :
 
-- La visualisation de données liées au COVID-19.
+- La visualisation des données liées au COVID-19.
 - La comparaison entre différents pays.
-- L'analyse de l'évolution des indicateurs.
+- L'analyse de l'évolution de la pandémie.
+- L'étude des campagnes de vaccination.
 - L'affichage de graphiques interactifs.
-- L'interprétation des données à travers différents tableaux de bord.
+- L'interprétation des données grâce à plusieurs tableaux de bord.
 
 ---
 
 ## Productions réalisées
 
 - Application web de data visualisation.
-- Graphiques interactifs.
-- Jeux de données structurés (CSV).
+- Graphiques interactifs réalisés avec Chart.js.
+- Jeux de données structurés au format CSV.
 - Pipeline ETL automatisé pour l'extraction, la transformation et le chargement des données.
 
 ---
@@ -136,10 +151,7 @@ Projet-Dataviz
 etl_covid.py
 
 data/
-├── evolution_mondiale.csv
-├── stats_pays.csv
-├── vaccination.csv
-└── stats_continents.csv
+└── (fichiers CSV générés automatiquement)
 
 index.html
 comparaison.html
@@ -152,11 +164,38 @@ style.css
 
 ---
 
-## Lancement du projet
+## Exécution du projet
 
-1. Exécuter le pipeline ETL.
-2. Générer les fichiers CSV nécessaires à l'application.
-3. Ouvrir le fichier `index.html`.
-4. Naviguer entre les différentes pages pour consulter les graphiques.
+### 1. Exécuter le pipeline ETL
 
-Les fichiers CSV présents dans le projet correspondent aux données structurées produites par le pipeline ETL et utilisées pour l'affichage des visualisations.
+```bash
+python etl_covid.py
+```
+
+Cette étape permet :
+
+- de récupérer les données depuis les sources Open Data ;
+- de transformer les données ;
+- de générer automatiquement les fichiers CSV nécessaires à l'application.
+
+### 2. Lancer l'application
+
+Ouvrir le fichier :
+
+```text
+index.html
+```
+
+Puis naviguer entre les différentes pages afin de consulter les visualisations et les analyses proposées.
+
+---
+
+## Résultat attendu
+
+Le projet fournit un outil d'analyse visuelle permettant :
+
+- d'explorer les données COVID-19 ;
+- de comparer différents pays et indicateurs ;
+- d'interpréter les évolutions observées grâce à des graphiques interactifs.
+
+Les fichiers CSV utilisés par l'application sont générés automatiquement par le pipeline ETL et ne sont pas stockés dans le dépôt GitHub.
