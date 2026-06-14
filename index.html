@@ -126,8 +126,8 @@
 <script src="utils.js"></script>
 <script>
 async function initStats() {
-  const evo  = await loadCSV('../data/transformed/evolution_mondiale.csv');
-  const pays = await loadCSV('../data/transformed/stats_pays.csv');
+  const evo  = await loadCSV('data/transformed/evolution_mondiale.csv');
+  const pays = await loadCSV('data/transformed/stats_pays.csv');
   const last = evo[evo.length - 1];
   animCounter(document.getElementById('s1'), (last.cumulative_cases  || 0) / 1e6, ' M', 1);
   animCounter(document.getElementById('s2'), (last.cumulative_deaths || 0) / 1e6, ' M', 2);
@@ -137,7 +137,7 @@ async function initStats() {
 
 async function initPreview() {
   setLoading('previewBox');
-  const evo = await loadCSV('../data/transformed/evolution_mondiale.csv');
+  const evo = await loadCSV('data/transformed/evolution_mondiale.csv');
   clearLoading('previewBox');
   const byMonth = {};
   evo.forEach(r => {
