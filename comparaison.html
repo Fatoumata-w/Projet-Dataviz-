@@ -120,8 +120,8 @@ let paysChart, allPays, currentMetric = 'deaths_per_million';
 async function init() {
   setLoading('paysBox'); setLoading('contBox1'); setLoading('contBox2');
   const [raw, cont] = await Promise.all([
-    loadCSV('../data/transformed/stats_pays.csv'),
-    loadCSV('../data/transformed/stats_continents.csv')
+    loadCSV('/data/transformed/stats_pays.csv'),
+    loadCSV('/data/transformed/stats_continents.csv')
   ]);
   allPays = raw.filter(r => r.deaths_per_million != null && r.deaths_per_million > 0 && r.Country);
   clearLoading('paysBox'); clearLoading('contBox1'); clearLoading('contBox2');
