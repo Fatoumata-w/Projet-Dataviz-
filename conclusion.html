@@ -183,7 +183,7 @@ function ptColor(country, vacc, deaths) {
 
 async function init() {
   setLoading('finalBox');
-  const raw=await loadCSV('../data/transformed/vaccination.csv');
+  const raw=await loadCSV('/data/transformed/vaccination.csv');
   clearLoading('finalBox');
   const valid=raw.filter(r=>r.people_fully_vaccinated_per_hundred!=null&&r.total_deaths_per_million!=null&&r.people_fully_vaccinated_per_hundred>0&&r.total_deaths_per_million>0);
   const pts=valid.map(r=>({x:+r.people_fully_vaccinated_per_hundred,y:+r.total_deaths_per_million,country:r.country}));
