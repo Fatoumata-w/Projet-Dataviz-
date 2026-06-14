@@ -4,128 +4,159 @@ EPSI Paris — BTS SIO SLAM — Dataviz 2
 
 ---
 
-##  1. Objectif du projet
-Ce projet a pour but de **visualiser l’évolution mondiale de la pandémie de COVID‑19** à partir de données officielles (OMS + Our World in Data).  
-Nous avons construit :
+## Présentation du projet
 
-- un **ETL complet** (Extraction → Transformation → Chargement)
-- un **site web de datavisualisation** (HTML/CSS/JS)
-- plusieurs **graphiques interactifs** (Chart.js)
-- une **carte mondiale choroplèthe** (Plotly)
-- une **analyse comparative** entre pays
-- une **analyse de la vaccination**
+L'objectif du projet est de concevoir un pipeline ETL permettant d'extraire, transformer et charger des données relatives au COVID-19 afin de les exploiter dans une application web de visualisation.
+
+L'application permet d'analyser et de comparer différents indicateurs grâce à des graphiques interactifs.
 
 ---
 
-##  2. Architecture du projet
-covid-dataviz/
-│
-├── data/
-│   ├── raw/               # Données brutes OMS / OWID
-│   └── transformed/       # Données nettoyées (CSV finaux)
-│
-├── etl/
-│   └── etl_covid.py       # Script ETL (nettoyage + fusion + calculs)
-│
-├── frontend/
-│   ├── index.html         # Page d’accueil
-│   ├── evolution.html     # Évolution mondiale (graphiques + carte)
-│   ├── comparaison.html   # Comparaison des pays
-│   ├── vaccination.html   # Vaccination mondiale
-│   ├── conclusion.html    # Synthèse finale
-│   ├── style.css          # Styles du site
-│   └── utils.js           # Fonctions JS + chargement CSV + graphiques
-│
-└── README.md
+## Problématique
 
+Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur analyse et leur compréhension à travers une interface web interactive ?
 
 ---
 
-##  3. Technologies utilisées
+## Objectifs
 
-### **Frontend**
-- HTML5 / CSS3
-- JavaScript ES6
-- Chart.js (graphiques)
-- Plotly.js (carte mondiale)
-- Responsive design
-
-### **Données**
-- CSV nettoyés via ETL
-- Sources :
-  - **OMS (WHO COVID‑19 Global Data)**
-  - **Our World in Data (OWID)**
-
-### **ETL**
-- Python  
-- Pandas  
-- Calculs ajoutés :
-  - `cases_per_million`
-  - `deaths_per_million`
-  - `deaths_per_1000`
-  - `mortality_rate`
+- Définir une problématique autour d'un jeu de données.
+- Concevoir un pipeline ETL.
+- Développer une interface web de visualisation.
+- Analyser et interpréter les données.
 
 ---
 
-##  4. ETL — Description rapide
+## Technologies utilisées
 
-Le script ETL effectue :
+### Développement Web
 
-1. **Extraction**  
-   - Chargement des fichiers bruts OMS + OWID
+- HTML
+- CSS
+- JavaScript
 
-2. **Transformation**  
-   - Nettoyage des colonnes
-   - Harmonisation des noms de pays
-   - Gestion des valeurs manquantes
-   - Calcul des indicateurs normalisés
+### Visualisation de données
 
-3. **Chargement**  
-   - Export en CSV dans `data/transformed/`
-   - Fichiers finaux utilisés par le site :
-     - `evolution_mondiale.csv`
-     - `stats_pays.csv`
-     - `vaccination.csv`
+- Chart.js
+
+### Outils
+
+- Visual Studio Code
+- GitHub
 
 ---
 
-##  5. Fonctionnalités du site
+## Sources de données
 
-### Page **Évolution**
-- Graphique des **3 vagues** (barres / courbes)
-- Graphique **cas vs décès** (double axe)
-- **Carte mondiale** des décès pour 1000 habitants (Plotly)
+Les données utilisées proviennent de sources Open Data :
 
-### Page **Comparaison**
-- Classement des pays selon :
-  - décès/million
-  - cas/million
-  - mortalité
-- Graphique horizontal interactif
+- Our World In Data (OWID)
+- Organisation Mondiale de la Santé (OMS)
 
-### Page **Vaccination**
-- Taux de vaccination par pays
-- Analyse du découplage cas/décès
-
-### Page **Conclusion**
-- Synthèse des observations
-- Interprétation des données
+Les données sont récupérées au format CSV puis préparées pour l'affichage des graphiques.
 
 ---
 
-##  6. Lancer le projet
+## Fonctionnement du pipeline ETL
 
-### Option 1 — Ouvrir directement les fichiers HTML  
-Fonctionne car les données sont en CSV local.
+### 1. Extract
 
-### Option 2 — Serveur local (recommandé)
-```bash
-cd frontend
-python -m http.server 8000
+- Récupération des données depuis des sources publiques.
+- Import des fichiers CSV.
+- Centralisation des données pour traitement.
 
- 7. Sources
-OMS — WHO COVID‑19 Global Data
+### 2. Transform
 
-Our World in Data — COVID‑19 Dataset
+- Tri des données selon différents critères.
+- Nettoyage des valeurs incohérentes ou manquantes.
+- Structuration et normalisation des données.
+- Agrégation des données pour faciliter l'analyse.
 
-Banque Mondiale — Indicateurs démographiques
+### 3. Load
+
+- Export des données nettoyées au format CSV.
+- Organisation des données selon les besoins des graphiques.
+- Préparation des données pour l'application web.
+
+---
+
+## Schéma du pipeline ETL
+
+```text
+Sources Open Data (OWID / OMS)
+                │
+                ▼
+            Extract
+                │
+                ▼
+           Transform
+     (tri, nettoyage,
+      normalisation)
+                │
+                ▼
+              Load
+        (fichiers CSV)
+                │
+                ▼
+      Application Web
+      HTML / CSS / JS
+                │
+                ▼
+      Graphiques Chart.js
+```
+
+---
+
+## Fonctionnalités
+
+L'application permet :
+
+- La visualisation de données liées au COVID-19.
+- La comparaison entre différents pays.
+- L'analyse de l'évolution des indicateurs.
+- L'affichage de graphiques interactifs.
+- L'interprétation des données à travers différents tableaux de bord.
+
+---
+
+## Productions réalisées
+
+- Application web de data visualisation.
+- Graphiques interactifs.
+- Jeux de données structurés (CSV).
+- Pipeline ETL automatisé pour l'extraction, la transformation et le chargement des données.
+
+---
+
+## Structure du projet
+
+```text
+Projet-Dataviz
+
+etl_covid.py
+
+data/
+├── evolution_mondiale.csv
+├── stats_pays.csv
+├── vaccination.csv
+└── stats_continents.csv
+
+index.html
+comparaison.html
+vaccination.html
+conclusion.html
+
+utils.js
+style.css
+```
+
+---
+
+## Lancement du projet
+
+1. Exécuter le pipeline ETL.
+2. Générer les fichiers CSV nécessaires à l'application.
+3. Ouvrir le fichier `index.html`.
+4. Naviguer entre les différentes pages pour consulter les graphiques.
+
+Les fichiers CSV présents dans le projet correspondent aux données structurées produites par le pipeline ETL et utilisées pour l'affichage des visualisations.
