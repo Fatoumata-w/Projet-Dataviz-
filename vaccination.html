@@ -10,7 +10,282 @@
     .map-tooltip-el { position:absolute; background:rgba(10,10,10,0.95); border:1px solid var(--border);
       padding:.6rem .9rem; font-size:.75rem; pointer-events:none; display:none; z-index:10;
       color:var(--ink); border-radius:2px; max-width:180px; line-height:1.5; }
+    .map-tooltip-el strong { display:<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Vaccination — COVID-19</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .map-container { position:relative; background:var(--bg2); border:1px solid var(--border); }
+    .map-tooltip-el { position:absolute; background:rgba(10,10,10,0.95); border:1px solid var(--border);
+      padding:.6rem .9rem; font-size:.75rem; pointer-events:none; display:none; z-index:10;
+      color:var(--ink); border-radius:2px; max-width:180px; line-height:1.5; }
     .map-tooltip-el strong { display:block; margin-bottom:.2rem; color:var(--ink); }
+    .legend-dot { display:flex; align-items:center; gap:5px; font-size:.72rem; color:var(--ink3); }
+    .legend-dot::before { content:''; width:9px; height:9px; border-radius:50%; background:var(--c); flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-pip"></span>COVID·19 DATAVIZ</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="evolution.html">Évolution</a></li>
+    <li><a href="comparaison.html">Comparaison</a></li>
+    <li><a href="vaccination.html" class="active">Vaccination</a></li>
+    <li><a href="conclusion.html">Conclusion</a></li>
+  </ul>
+  <button class="nav-burger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-num">Sous-question 03 / 03 — Question centrale</div>
+    <h1>La vaccination<br/>a-t-elle réduit<br/>la mortalité ?</h1>
+    <p>Le graphique qui répond directement à notre problématique : corrélation entre taux de vaccination et décès par million.</p>
+  </div>
+</div>
+
+<!-- SCATTER PLOT -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">03.1 · Corrélation vaccination ↔ mortalité</div>
+    <h2 class="section-title">Taux de vaccination vs décès par million</h2>
+    <p class="section-sub">Chaque point = un pays. La ligne pointillée montre la tendance générale. Survolez un point pour voir le pays.</p>
+    <div class="chart-box" style="height:480px;position:relative" id="scatterBox">
+      <canvas id="scatterChart"></canvas>
+    </div>
+    <div style="display:flex;gap:1.2rem;margin-top:.8rem;flex-wrap:wrap;align-items:center">
+      <span style="font-family:var(--mono);font-size:.6rem;color:var(--ink4);margin-right:.3rem">CONTINENT</span>
+      <span class="legend-dot" style="--c:#E8302A">Amériques</span>
+      <span class="legend-dot" style="--c:#3A7EC8">Europe</span>
+      <span class="legend-dot" style="--c:#2A8A5A">Asie du Sud</span>
+      <span class="legend-dot" style="--c:#C8862A">Afrique</span>
+      <span class="legend-dot" style="--c:#7A5AC8">Pacifique</span>
+      <span class="legend-dot" style="--c:#7A7670">Proche-Orient</span>
+    </div>
+    <p class="chart-caption" style="margin-top:.5rem">Source : vaccination.csv — Our World in Data</p>
+    <div class="insight" style="margin-top:1.5rem">
+      <div class="insight-title">Tendance claire, mais pas parfaite</div>
+      <p>Plus un pays est vacciné, moins il enregistre de décès — c'est la tendance générale. Mais les USA (fort taux de vaccination, forte mortalité) montrent que d'autres facteurs entrent en jeu : inégalités sociales, obésité, système de santé.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CARTE -->
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">03.2 · Carte mondiale</div>
+    <h2 class="section-title">Couverture vaccinale par pays</h2>
+    <p class="section-sub">Plus la couleur est claire, plus le pays est vacciné. Survolez un pays pour voir son taux.</p>
+    <div class="map-container" style="height:460px" id="mapBox">
+      <div class="chart-loading" id="mapLoader">Chargement de la carte...</div>
+      <div class="map-tooltip-el" id="mapTooltip"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.7rem">
+      <span style="font-family:var(--mono);font-size:.6rem;color:var(--ink4)">0%</span>
+      <div style="flex:1;max-width:260px;height:8px;border-radius:2px;background:linear-gradient(to right,#1a1a2e,#1565c0,#42a5f5,#90caf9)"></div>
+      <span style="font-family:var(--mono);font-size:.6rem;color:var(--ink4)">100%</span>
+      <span style="font-family:var(--mono);font-size:.6rem;color:var(--ink4);margin-left:.8rem">Données manquantes</span>
+      <div style="width:14px;height:8px;background:#2a2a2a;border:1px solid var(--border);border-radius:1px"></div>
+    </div>
+    <p class="chart-caption" style="margin-top:.4rem">Source : vaccination.csv — Our World in Data</p>
+    <div class="two-col" style="margin-top:1.5rem">
+      <div class="insight">
+        <div class="insight-title">Pays riches : plus de 80% vaccinés</div>
+        <p>Europe occidentale, Amérique du Nord, Asie développée. Ces pays ont eu accès aux vaccins en priorité dès début 2021.</p>
+      </div>
+      <div class="insight">
+        <div class="insight-title">Afrique : moins de 20% en moyenne</div>
+        <p>Manque de financement et d'infrastructure. Ces pays ont traversé les vagues sans protection — c'est ce qu'on appelle l'inégalité d'accès au vaccin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BAR TOP/BOTTOM -->
+<section class="section fade-up">
+  <div class="section-inner">
+    <div class="section-tag">03.3 · Classement vaccination</div>
+    <h2 class="section-title">Les 15 pays les plus et les moins vaccinés</h2>
+    <p class="section-sub">En bleu les mieux vaccinés, en rouge les moins vaccinés.</p>
+    <div class="chart-box" style="height:560px" id="vaccBox">
+      <canvas id="vaccBar"></canvas>
+    </div>
+    <p class="chart-caption">Source : vaccination.csv — Our World in Data</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><div class="footer-brand">COVID·19 DATAVIZ</div><p>Projet Dev Front — Dataviz 2</p></div>
+    <p>Sources : OMS · Our World in Data · ETL par DOUCOURE Hawa &amp; BA Fatoumata Batouly</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="utils.js"></script>
+<script>
+// Correspondance code OMS → couleur + libellé
+const WHO_COLOR = { 'AMRO':'#E8302A','EURO':'#3A7EC8','SEARO':'#2A8A5A','AFRO':'#C8862A','WPRO':'#7A5AC8','EMRO':'#7A7670','OTHER':'#3E3C38' };
+const WHO_FR    = { 'AMRO':'Amériques','EURO':'Europe','SEARO':'Asie du Sud','AFRO':'Afrique','WPRO':'Pacifique','EMRO':'Proche-Orient','OTHER':'Autre' };
+
+function trendLine(data) {
+  const n = data.length;
+  if (n < 2) return [];
+  const sx=data.reduce((s,d)=>s+d.x,0), sy=data.reduce((s,d)=>s+d.y,0);
+  const sxy=data.reduce((s,d)=>s+d.x*d.y,0), sx2=data.reduce((s,d)=>s+d.x*d.x,0);
+  const slope=(n*sxy-sx*sy)/(n*sx2-sx*sx), ic=(sy-slope*sx)/n;
+  const xs=data.map(d=>d.x);
+  return [{x:Math.min(...xs),y:Math.max(0,slope*Math.min(...xs)+ic)},{x:Math.max(...xs),y:Math.max(0,slope*Math.max(...xs)+ic)}];
+}
+
+async function init() {
+  setLoading('scatterBox'); setLoading('vaccBox');
+  const [vacc, pays] = await Promise.all([
+    loadCSV('data/transformed/vaccination.csv'),
+    loadCSV('data/transformed/stats_pays.csv')
+  ]);
+
+  // Index pays → région OMS
+  const regionMap = {};
+  pays.forEach(p => { if (p.Country) regionMap[p.Country.trim().toLowerCase()] = p.WHO_region || 'OTHER'; });
+
+  const valid = vacc.filter(r => r.people_fully_vaccinated_per_hundred != null && r.total_deaths_per_million != null && r.people_fully_vaccinated_per_hundred > 1 && r.total_deaths_per_million > 0);
+  const pts = valid.map(r => {
+    const region = regionMap[r.country?.trim().toLowerCase()] || 'OTHER';
+    return { x: +r.people_fully_vaccinated_per_hundred, y: +r.total_deaths_per_million, country: r.country, region };
+  });
+
+  clearLoading('scatterBox'); clearLoading('vaccBox');
+
+  const NOTABLE = ['United States','Japan','Peru','Germany','France','Brazil','Portugal','South Korea','India','Bulgaria'];
+
+  new Chart(document.getElementById('scatterChart'), {
+    type: 'scatter',
+    data: { datasets: [
+      { label: 'Pays', data: pts,
+        backgroundColor: pts.map(p => (WHO_COLOR[p.region]||'#7A7670')+'CC'),
+        borderColor:     pts.map(p =>  WHO_COLOR[p.region]||'#7A7670'),
+        borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 },
+      { label: 'Tendance', data: trendLine(pts), type: 'line',
+        borderColor: 'rgba(242,239,233,0.25)', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 20, right: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...TOOLTIP, callbacks: { label: ctx => {
+          if (ctx.datasetIndex===1) return null;
+          const p = pts[ctx.dataIndex];
+          return [p.country, `Vaccination : ${p.x.toFixed(1)}%`, `Décès : ${Math.round(p.y).toLocaleString('fr-FR')}/million`, `Continent : ${WHO_FR[p.region]||p.region}`];
+        }}}
+      },
+      scales: {
+        x: { min:0, max:105, title:{ display:true, text:'Taux de vaccination (%)', color:INK3, font:{size:11} }, grid:{color:GRID_COLOR}, ticks:{color:INK3, callback:v=>v+'%'} },
+        y: { title:{ display:true, text:"Décès par million d'habitants", color:INK3, font:{size:11} }, grid:{color:GRID_COLOR}, ticks:{color:INK3, callback:v=>v.toLocaleString('fr-FR')} }
+      }
+    },
+    plugins: [{ id:'lbl', afterDatasetsDraw(chart) {
+      const ctx2=chart.ctx; ctx2.save();
+      ctx2.font="500 9.5px 'DM Mono',monospace";
+      chart.getDatasetMeta(0).data.forEach((pt,i) => {
+        const p=pts[i];
+        if (NOTABLE.some(n => p.country&&p.country.includes(n))) {
+          ctx2.fillStyle=WHO_COLOR[p.region]||INK3;
+          ctx2.fillText(p.country, pt.x+9, pt.y-4);
+        }
+      });
+      ctx2.restore();
+    }}]
+  });
+
+  // Bar top15 / bottom15
+  const sorted=[...vacc].filter(r=>r.people_fully_vaccinated_per_hundred!=null).sort((a,b)=>b.people_fully_vaccinated_per_hundred-a.people_fully_vaccinated_per_hundred);
+  const top15=sorted.slice(0,15), bot15=sorted.slice(-15).reverse();
+  const combined=[...top15,...bot15];
+  new Chart(document.getElementById('vaccBar'), {
+    type: 'bar',
+    data: { labels: combined.map(r=>r.country), datasets: [{ data: combined.map(r=>r.people_fully_vaccinated_per_hundred),
+      backgroundColor: combined.map((_,i) => i<15 ? `rgba(58,126,200,${0.5+0.5*(1-i/15)})` : `rgba(232,48,42,${0.4+0.6*((i-15)/15)})`),
+      borderRadius: 2, borderSkipped: false }] },
+    options: {
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...TOOLTIP, callbacks:{label:c=>`${c.parsed.x.toFixed(1)}% vaccinés`}} },
+      scales:{ x:{min:0,max:100,grid:{color:GRID_COLOR},ticks:{color:INK3,callback:v=>v+'%'}}, y:{grid:{display:false},ticks:{color:INK3,font:{size:10}}} }
+    }
+  });
+
+  buildMap(vacc);
+}
+
+async function buildMap(vaccData) {
+  const mapBox=document.getElementById('mapBox'), loader=document.getElementById('mapLoader');
+  const vaccByName={};
+  vaccData.forEach(r => { if (r.country&&r.people_fully_vaccinated_per_hundred!=null) vaccByName[r.country.toLowerCase().trim()]=+r.people_fully_vaccinated_per_hundred; });
+
+  const NAME_TO_ID = {
+    'afghanistan':'4','albania':'8','algeria':'12','angola':'24','argentina':'32','australia':'36','austria':'40',
+    'azerbaijan':'31','bangladesh':'50','belgium':'56','bolivia':'68','bosnia and herzegovina':'70','brazil':'76',
+    'bulgaria':'100','canada':'124','chile':'152','china':'156','colombia':'170','croatia':'191','cuba':'192',
+    'czechia':'203','czech republic':'203','denmark':'208','dominican republic':'214','ecuador':'218','egypt':'818',
+    'ethiopia':'231','finland':'246','france':'250','germany':'276','ghana':'288','greece':'300','guatemala':'320',
+    'hungary':'348','india':'356','indonesia':'360','iran':'364','iraq':'368','ireland':'372','israel':'376',
+    'italy':'380','japan':'392','jordan':'400','kazakhstan':'398','kenya':'404','south korea':'410',
+    'malaysia':'458','mexico':'484','morocco':'504','mozambique':'508','myanmar':'104','nepal':'524',
+    'netherlands':'528','new zealand':'554','nigeria':'566','norway':'578','pakistan':'586','peru':'604',
+    'philippines':'608','poland':'616','portugal':'620','romania':'642','russia':'643','saudi arabia':'682',
+    'serbia':'688','south africa':'710','spain':'724','sri lanka':'144','sweden':'752','switzerland':'756',
+    'thailand':'764','turkey':'792','ukraine':'804','united arab emirates':'784','united kingdom':'826',
+    'united states':'840','uruguay':'858','venezuela':'862','vietnam':'704','zimbabwe':'716',
+    'democratic republic of congo':'180','tanzania':'834','uganda':'800','cameroon':'120',
+    'senegal':'686','mali':'466','niger':'562','burkina faso':'854','madagascar':'450','angola':'24',
+    'zambia':'894','malawi':'454','namibia':'516','botswana':'72'
+  };
+
+  const vaccById={};
+  Object.entries(vaccByName).forEach(([name,val])=>{ const id=NAME_TO_ID[name]; if(id) vaccById[id]=val; });
+
+  try {
+    const world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    if (loader) loader.remove();
+    const W=mapBox.clientWidth||900, H=460;
+    const svg=d3.select('#mapBox').append('svg').attr('width','100%').attr('height',H).attr('viewBox',`0 0 ${W} ${H}`).style('display','block');
+    svg.append('rect').attr('width',W).attr('height',H).attr('fill','#0d1117');
+    const proj=d3.geoNaturalEarth1().scale(W/6.3).translate([W/2,H/2.1]);
+    const path=d3.geoPath(proj);
+    const colorScale=d3.scaleSequential().domain([0,100]).interpolator(t=>`rgb(${Math.round(20+t*38)},${Math.round(20+t*100)},${Math.round(30+t*175)})`);
+    const countries=topojson.feature(world,world.objects.countries);
+    svg.selectAll('path').data(countries.features).join('path')
+      .attr('d',path)
+      .attr('fill',d=>{ const v=vaccById[String(d.id)]; return v!=null?colorScale(v):'#2a2a2a'; })
+      .attr('stroke','rgba(255,255,255,0.08)').attr('stroke-width',0.4)
+      .on('mousemove',function(event,d){
+        const v=vaccById[String(d.id)];
+        const tt=document.getElementById('mapTooltip');
+        tt.innerHTML=`<strong>${d.properties?.name||'Pays'}</strong>${v!=null?v.toFixed(1)+'% vaccinés':'Données manquantes'}`;
+        tt.style.display='block';
+        const rect=mapBox.getBoundingClientRect();
+        let x=event.clientX-rect.left+12, y=event.clientY-rect.top-10;
+        if(x+160>W) x=x-180;
+        tt.style.left=x+'px'; tt.style.top=y+'px';
+      })
+      .on('mouseleave',()=>{ document.getElementById('mapTooltip').style.display='none'; });
+    svg.append('path').datum(topojson.mesh(world,world.objects.countries,(a,b)=>a!==b))
+      .attr('d',path).attr('fill','none').attr('stroke','rgba(255,255,255,0.06)').attr('stroke-width',0.3);
+  } catch(e) { if(loader) loader.textContent='Erreur de chargement de la carte'; console.error(e); }
+}
+init();
+</script>
+</body>
+</html>
+block; margin-bottom:.2rem; color:var(--ink); }
     .legend-dot { display:flex; align-items:center; gap:5px; font-size:.72rem; color:var(--ink3); }
     .legend-dot::before { content:''; width:9px; height:9px; border-radius:50%; background:var(--c); flex-shrink:0; }
   </style>
