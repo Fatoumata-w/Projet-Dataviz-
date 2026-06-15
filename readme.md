@@ -7,25 +7,26 @@
 
 ## Présentation du projet
 
-Dans le cadre du BTS SIO option SLAM, ce projet a été réalisé en groupe afin de mettre en œuvre un pipeline ETL complet permettant d'exploiter des données ouvertes relatives à la pandémie de COVID-19.
+Ce projet a été réalisé en groupe dans le cadre du BTS SIO option SLAM.
 
-L'objectif est de récupérer des données issues de sources Open Data, de les transformer afin de les rendre exploitables puis de les afficher dans une application web interactive proposant plusieurs visualisations graphiques.
+L'objectif est de créer un pipeline ETL permettant de récupérer des données Open Data sur le COVID-19, de les nettoyer, puis de les utiliser dans une application web de visualisation.
+
+L'application permet de comparer et d'interpréter différents indicateurs liés à la pandémie grâce à des graphiques interactifs.
 
 ---
 
 ## Problématique
 
-Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur analyse et leur compréhension grâce à une interface web de visualisation interactive ?
+Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur analyse et leur compréhension grâce à une interface web interactive ?
 
 ---
 
-## Objectifs du projet
+## Objectifs
 
 - Définir une problématique autour d'un jeu de données.
-- Concevoir un pipeline ETL automatisé.
-- Extraire, transformer et charger des données issues de sources Open Data.
+- Concevoir un pipeline ETL.
 - Développer une interface web de visualisation.
-- Analyser et interpréter les données à travers différents graphiques.
+- Analyser et interpréter les données.
 
 ---
 
@@ -49,10 +50,13 @@ Comment exploiter des données Open Data sur le COVID-19 afin de faciliter leur 
 ---
 
 ## Sources de données
-- Our World In Data (OWID) - Compact COVID Dataset
+
+Les données proviennent de sources Open Data :
+
+- Our World In Data (OWID)
 - Organisation Mondiale de la Santé (OMS)
 
-Les données sont récupérées au format CSV puis préparées afin d'être exploitées par l'application web.
+Les données sont récupérées au format CSV puis préparées pour l'affichage des graphiques.
 
 ---
 
@@ -60,34 +64,22 @@ Les données sont récupérées au format CSV puis préparées afin d'être expl
 
 ### 1. Extract
 
-Cette étape consiste à récupérer les données depuis des sources Open Data.
-
-Actions réalisées :
-
-- Récupération des données COVID-19 depuis OWID et l'OMS.
-- Import des fichiers au format CSV.
-- Centralisation des données pour leur traitement.
+- Récupération des données depuis des sources publiques.
+- Import des données au format CSV.
+- Centralisation des données pour le traitement.
 
 ### 2. Transform
 
-Cette étape permet de préparer les données pour l'analyse.
-
-Actions réalisées :
-
-- Tri des données selon différents critères (dates, pays, indicateurs).
-- Nettoyage des données manquantes ou incohérentes.
-- Structuration et normalisation des informations.
-- Agrégation des données afin de faciliter les analyses statistiques.
+- Tri des données selon les dates, les pays et les indicateurs.
+- Nettoyage des valeurs manquantes.
+- Structuration des données.
+- Calcul d'indicateurs utiles pour l'analyse.
 
 ### 3. Load
 
-Cette étape consiste à préparer les données pour l'application.
-
-Actions réalisées :
-
-- Génération de fichiers CSV structurés.
-- Organisation des données selon les besoins des visualisations.
-- Mise à disposition des données pour l'application web.
+- Génération de fichiers CSV propres.
+- Organisation des données selon les besoins des graphiques.
+- Utilisation des fichiers par l'application web.
 
 ---
 
@@ -102,7 +94,7 @@ Sources Open Data (OWID / OMS)
                 ▼
            Transform
       (tri, nettoyage,
-       normalisation)
+       structuration)
                 │
                 ▼
               Load
@@ -122,19 +114,17 @@ Sources Open Data (OWID / OMS)
 
 L'application permet :
 
-- La visualisation des données liées au COVID-19.
-- La comparaison entre différents pays.
-- L'analyse de l'évolution de la pandémie.
-- L'étude des campagnes de vaccination.
-- L'affichage de graphiques interactifs.
-- L'interprétation des données grâce à plusieurs tableaux de bord.
+- de visualiser l'évolution mondiale du COVID-19 ;
+- de comparer les pays selon plusieurs indicateurs ;
+- d'analyser le lien entre vaccination et mortalité ;
+- d'afficher des graphiques interactifs avec Chart.js.
 
 ---
 
 ## Productions réalisées
 
 - Application web de data visualisation.
-- Graphiques interactifs réalisés avec Chart.js.
+- Graphiques interactifs.
 - Jeux de données structurés au format CSV.
 - Pipeline ETL automatisé pour l'extraction, la transformation et le chargement des données.
 
@@ -147,52 +137,40 @@ Projet-Dataviz
 
 etl_covid.py
 
-data/
-└── (fichiers CSV générés automatiquement)
-
 index.html
 comparaison.html
+evolution.html
 vaccination.html
 conclusion.html
 
 utils.js
 style.css
+
+data/
+└── transformed/
+    └── fichiers CSV générés automatiquement
 ```
 
 ---
 
-## Exécution du projet
+## Lancement du projet
 
-### 1. Exécuter le pipeline ETL
+### 1. Générer les fichiers CSV
 
 ```bash
 python etl_covid.py
 ```
 
-Cette étape permet :
+### 2. Lancer le site en local
 
-- de récupérer les données depuis les sources Open Data ;
-- de transformer les données ;
-- de générer automatiquement les fichiers CSV nécessaires à l'application.
-
-### 2. Lancer l'application
-
-Ouvrir le fichier :
-
-```text
-index.html
+```bash
+python -m http.server 8000
 ```
 
-Puis naviguer entre les différentes pages afin de consulter les visualisations et les analyses proposées.
+### 3. Ouvrir le site
 
----
+```text
+http://localhost:8000
+```
 
-## Résultat attendu
-
-Le projet fournit un outil d'analyse visuelle permettant :
-
-- d'explorer les données COVID-19 ;
-- de comparer différents pays et indicateurs ;
-- d'interpréter les évolutions observées grâce à des graphiques interactifs.
-
-Les fichiers CSV utilisés par l'application sont générés automatiquement par le pipeline ETL et ne sont pas stockés dans le dépôt GitHub.
+Les fichiers CSV ne sont pas stockés directement dans le dépôt GitHub. Ils sont générés automatiquement par le pipeline ETL.
